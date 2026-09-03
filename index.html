@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ferramentas de Apoio — Avaliação e Maturação</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --brand-navy:#0B1F3A; --brand-orange:#FF5A1F; --brand-lime:#D6FF3D;
+  --bg:#F5F6F2; --surface:#FFFFFF;
+  --text:#0B1F3A; --text-muted:#5B647A; --border:#E3E5DD;
+  --shadow: 0 1px 2px rgba(11,31,58,.06), 0 8px 24px -12px rgba(11,31,58,.18);
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Source Sans 3',system-ui,sans-serif;font-size:16px;line-height:1.5;}
+h1,h2{font-family:'Barlow Condensed',system-ui,sans-serif;text-wrap:balance;margin:0;}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px 64px;}
+header.band{background:var(--brand-navy);color:#fff;padding:28px 20px 34px;}
+header.band .wrap{padding-bottom:0;}
+.eyebrow{font-family:'Barlow Condensed',system-ui,sans-serif;font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-orange);margin:0 0 6px;}
+header.band h1{font-size:clamp(26px,4vw,36px);font-weight:700;color:#fff;}
+header.band p.sub{margin:8px 0 0;color:#C7D0E0;font-size:15px;max-width:62ch;}
+header.band p.author{margin:18px 0 0;color:#9FB0CE;font-size:13.5px;font-style:italic;text-align:right;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:36px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:24px;text-decoration:none;color:var(--text);display:block;transition:transform .12s ease;}
+.card:hover{transform:translateY(-2px);}
+.card .strip{height:5px;width:40px;border-radius:3px;background:var(--brand-orange);margin-bottom:16px;}
+.card h2{font-size:22px;font-weight:600;margin-bottom:8px;}
+.card p{color:var(--text-muted);font-size:14.5px;margin:0;}
+.card .go{margin-top:16px;font-size:13.5px;font-weight:600;color:var(--brand-orange);}
+footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--border);color:var(--text-muted);font-size:12.5px;text-align:center;}
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="wrap">
+    <p class="eyebrow">Pós-Graduação em Treinamento Esportivo · UEL — Turma 2</p>
+    <h1>Ferramentas de Apoio — Avaliação e Maturação</h1>
+    <p class="sub">Duas calculadoras para uso em sala e fora dela: estatura predita, Maturity Offset / PVE e percentual de gordura.</p>
+    <p class="author">Prof. Dr. Hélcio Rossi Gonçalves</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="cards">
+    <a class="card" href="calculadora-maturacao.html">
+      <div class="strip"></div>
+      <h2>Calculadora de Maturação</h2>
+      <p>Estatura predita (Khamis &amp; Roche, 1994) e Maturity Offset / Idade no PVE (Mirwald et al., 2002).</p>
+      <div class="go">Abrir a calculadora →</div>
+    </a>
+    <a class="card" href="modulo-avaliacao-antropometrica.html">
+      <div class="strip" style="background:var(--brand-lime)"></div>
+      <h2>Módulo de Avaliação Antropométrica e de Maturação Morfológica</h2>
+      <p>Os cálculos acima, mais percentual de gordura (Slaughter et al., 1988) — os três juntos num só lugar.</p>
+      <div class="go">Abrir o módulo →</div>
+    </a>
+  </div>
+
+  <footer>Khamis &amp; Roche (1994) · Mirwald et al. (2002) · Slaughter et al. (1988) — uso didático; não substitui avaliação clínica individualizada.</footer>
+</div>
+
+</body>
+</html>

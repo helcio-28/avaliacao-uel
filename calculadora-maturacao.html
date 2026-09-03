@@ -1,0 +1,331 @@
+<title>Calculadora de Maturação</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --brand-navy:#0B1F3A; --brand-navy-deep:#16345C; --brand-orange:#FF5A1F; --brand-lime:#D6FF3D;
+  --bg:#F5F6F2; --surface:#FFFFFF; --surface-2:#FBFAF6;
+  --text:#0B1F3A; --text-muted:#5B647A; --border:#E3E5DD; --border-strong:#CDD1C6;
+  --sem-good:#2E7D4F; --sem-good-bg:#E7F4EC;
+  --sem-warn:#B7791F; --sem-warn-bg:#FBF0DD;
+  --sem-info:#2E5C8A; --sem-info-bg:#E8EEF6;
+  --shadow: 0 1px 2px rgba(11,31,58,.06), 0 8px 24px -12px rgba(11,31,58,.18);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1420; --surface:#101B2E; --surface-2:#0D1826;
+    --text:#E9EDF5; --text-muted:#93A0B8; --border:#233350; --border-strong:#324867;
+    --sem-good:#5FCB8B; --sem-good-bg:#12301F;
+    --sem-warn:#E3B34E; --sem-warn-bg:#332507;
+    --sem-info:#7FB0E8; --sem-info-bg:#132540;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1420; --surface:#101B2E; --surface-2:#0D1826;
+  --text:#E9EDF5; --text-muted:#93A0B8; --border:#233350; --border-strong:#324867;
+  --sem-good:#5FCB8B; --sem-good-bg:#12301F;
+  --sem-warn:#E3B34E; --sem-warn-bg:#332507;
+  --sem-info:#7FB0E8; --sem-info-bg:#132540;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Source Sans 3',system-ui,sans-serif;font-size:16px;line-height:1.5;}
+h1,h2,h3{font-family:'Barlow Condensed',system-ui,sans-serif;text-wrap:balance;margin:0;}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 64px;}
+
+header.band{background:var(--brand-navy);color:#fff;padding:28px 20px 34px;}
+header.band .wrap{padding-bottom:0;}
+.eyebrow{font-family:'Barlow Condensed',system-ui,sans-serif;font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-orange);margin:0 0 6px;}
+header.band h1{font-size:clamp(28px,4vw,38px);font-weight:700;color:#fff;}
+header.band p.sub{margin:8px 0 0;color:#C7D0E0;font-size:15px;max-width:60ch;}
+header.band p.author{margin:18px 0 0;color:#9FB0CE;font-size:13.5px;font-style:italic;text-align:right;}
+
+.section-title{display:flex;align-items:baseline;gap:10px;margin:40px 0 4px;}
+.section-title h2{font-size:26px;font-weight:600;color:var(--text);}
+.section-title .tag{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);}
+.section-desc{color:var(--text-muted);font-size:14.5px;max-width:68ch;margin:2px 0 18px;}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:22px 24px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px 18px;}
+.field label{display:block;font-size:12.5px;font-weight:600;letter-spacing:.02em;color:var(--text-muted);margin-bottom:5px;}
+.field select,.field input{width:100%;padding:9px 10px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface-2);color:var(--text);font:inherit;font-size:15px;}
+.field select:focus,.field input:focus{outline:2px solid var(--brand-orange);outline-offset:1px;border-color:var(--brand-orange);}
+.field .unit{color:var(--text-muted);font-size:12.5px;margin-left:4px;}
+
+.btn{appearance:none;border:none;border-radius:9px;padding:11px 20px;font:inherit;font-weight:600;font-size:15px;cursor:pointer;background:var(--brand-orange);color:#fff;box-shadow:0 4px 12px -4px rgba(255,90,31,.55);}
+.btn:hover{filter:brightness(1.05);}
+.btn:active{transform:translateY(1px);}
+.btn-row{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.example-badge{font-size:12px;color:var(--text-muted);font-style:italic;}
+
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-top:22px;}
+.result-card{border-radius:14px;overflow:hidden;background:var(--brand-navy);color:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column;}
+.result-card .strip{height:5px;background:var(--brand-orange);}
+.result-card .body{padding:20px 22px 22px;}
+.result-card .kicker{font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#AFC0DE;margin-bottom:8px;}
+.result-card .big{font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:600;font-size:38px;line-height:1;font-variant-numeric:tabular-nums;}
+.result-card .caption{color:#C7D0E0;font-size:13.5px;margin-top:6px;}
+.result-card .breakdown{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.14);font-size:13px;color:#C7D0E0;}
+.result-card .breakdown div{display:flex;justify-content:space-between;gap:10px;padding:2px 0;}
+.result-card .breakdown span.v{font-family:'IBM Plex Mono',ui-monospace,monospace;color:#fff;}
+.pill{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:600;}
+.pill.good{background:var(--sem-good-bg);color:var(--sem-good);}
+.pill.warn{background:var(--sem-warn-bg);color:var(--sem-warn);}
+.pill.info{background:var(--sem-info-bg);color:var(--sem-info);}
+.pill-on-dark{background:rgba(255,255,255,.12);color:#fff;}
+
+.note{font-size:13px;color:var(--text-muted);margin-top:14px;line-height:1.55;}
+.note strong{color:var(--text);}
+footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--border);color:var(--text-muted);font-size:12.5px;text-align:center;}
+</style>
+
+<header class="band">
+  <div class="wrap">
+    <p class="eyebrow">Pós-Graduação em Treinamento Esportivo · UEL — Turma 2</p>
+    <h1>Calculadora de Maturação</h1>
+    <p class="sub">Estatura predita (Khamis &amp; Roche, 1994) e Maturity Offset / Idade no PVE (Mirwald et al., 2002) — uma ficha, os dados do avaliado, o resultado na hora.</p>
+    <p class="author">Prof. Dr. Hélcio Rossi Gonçalves</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="section-title"><h2>Dados do(a) avaliado(a)</h2><span class="tag">exemplo pré-carregado</span></div>
+  <p class="section-desc">Preencha os dados de estatura, peso e das estaturas dos pais — eles alimentam as duas calculadoras abaixo.</p>
+
+  <div class="panel">
+    <div class="grid">
+      <div class="field">
+        <label for="sexo">Sexo</label>
+        <select id="sexo"><option value="M">Masculino</option><option value="F">Feminino</option></select>
+      </div>
+      <div class="field">
+        <label for="dataNasc">Data de nascimento</label>
+        <input type="date" id="dataNasc" value="2016-05-04">
+      </div>
+      <div class="field">
+        <label for="dataAval">Data da avaliação</label>
+        <input type="date" id="dataAval" value="2026-05-04">
+      </div>
+      <div class="field">
+        <label for="estatura">Estatura atual <span class="unit">cm</span></label>
+        <input type="number" step="0.1" id="estatura" value="138.0">
+      </div>
+      <div class="field">
+        <label for="peso">Massa corporal <span class="unit">kg</span></label>
+        <input type="number" step="0.1" id="peso" value="32.0">
+      </div>
+      <div class="field">
+        <label for="estSentado">Estatura sentado <span class="unit">cm</span></label>
+        <input type="number" step="0.1" id="estSentado" value="72.0">
+      </div>
+      <div class="field">
+        <label for="estPai">Estatura do pai <span class="unit">cm</span></label>
+        <input type="number" step="0.1" id="estPai" value="176.0">
+      </div>
+      <div class="field">
+        <label for="estMae">Estatura da mãe <span class="unit">cm</span></label>
+        <input type="number" step="0.1" id="estMae" value="160.0">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btnCalc">Calcular</button>
+      <span class="example-badge" id="exampleBadge">Valores de exemplo — substitua pelos dados reais do avaliado.</span>
+    </div>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <footer>Khamis &amp; Roche (1994) · Mirwald et al. (2002) — coeficientes originais (polegadas/libras, Tabelas 6 e 7), com conversão cm↔polegada e kg↔libra feita internamente pelo código. Uso didático; não substitui avaliação clínica individualizada.</footer>
+</div>
+
+<script>
+// Khamis-Roche (1994) — coeficientes ORIGINAIS em polegadas/libras (Tabela 6 masculino, Tabela 7 feminino).
+// A conversão cm↔polegada e kg↔libra acontece dentro de calcEstaturaPredita(), não nos coeficientes.
+// [idade, beta0, coefEstatura, coefPeso, coefEstaturaPais]
+const KR_M = [
+[4.0,-10.2567,1.23812,-0.087235,0.50286],[4.5,-10.7190,1.15964,-0.074454,0.52887],
+[5.0,-11.0213,1.10674,-0.064778,0.53919],[5.5,-11.1556,1.07480,-0.057760,0.53691],
+[6.0,-11.1138,1.05923,-0.052947,0.52513],[6.5,-11.0221,1.05542,-0.049892,0.50692],
+[7.0,-10.9984,1.05877,-0.048144,0.48538],[7.5,-11.0214,1.06467,-0.047256,0.46361],
+[8.0,-11.0696,1.06853,-0.046778,0.44469],[8.5,-11.1220,1.06572,-0.046261,0.43171],
+[9.0,-11.1571,1.05166,-0.045254,0.42776],[9.5,-11.1405,1.02174,-0.043311,0.43593],
+[10.0,-11.0380,0.97135,-0.039981,0.45932],[10.5,-10.8286,0.89589,-0.034814,0.50101],
+[11.0,-10.4917,0.81239,-0.029050,0.54781],[11.5,-10.0065,0.74134,-0.024167,0.58409],
+[12.0,-9.3522,0.68325,-0.020076,0.60927],[12.5,-8.6055,0.63869,-0.016681,0.62279],
+[13.0,-7.8632,0.60818,-0.013895,0.62407],[13.5,-7.1348,0.59228,-0.011624,0.61253],
+[14.0,-6.4299,0.59151,-0.009776,0.58762],[14.5,-5.7578,0.60643,-0.008261,0.54875],
+[15.0,-5.1282,0.63757,-0.006988,0.49536],[15.5,-4.5092,0.68548,-0.005863,0.42687],
+[16.0,-3.9292,0.75069,-0.004795,0.34271],[16.5,-3.4873,0.83375,-0.003695,0.24231],
+[17.0,-3.2830,0.93520,-0.002470,0.12510],[17.5,-3.4156,1.05558,-0.001027,-0.00950]
+];
+const KR_F = [
+[4.0,-8.13250,1.24768,-0.19435,0.44774],[4.5,-6.47656,1.22177,-0.185519,0.41381],
+[5.0,-5.13583,1.19932,-0.175530,0.38467],[5.5,-4.13791,1.17880,-0.16484,0.36039],
+[6.0,-3.51039,1.15866,-0.15400,0.34105],[6.5,-3.14322,1.13737,-0.14294,0.32672],
+[7.0,-2.87645,1.11342,-0.13184,0.31748],[7.5,-2.66291,1.08525,-0.12086,0.31340],
+[8.0,-2.45559,1.05135,-0.11019,0.31457],[8.5,-2.20728,1.01018,-0.09999,0.32105],
+[9.0,-1.87098,0.96020,-0.09044,0.33291],[9.5,-1.06330,0.89989,-0.08171,0.35025],
+[10.0,0.33468,0.82771,-0.07397,0.37312],[10.5,1.97366,0.74213,-0.06739,0.40161],
+[11.0,3.50436,0.67173,-0.06136,0.42042],[11.5,4.57747,0.64150,-0.05518,0.41686],
+[12.0,4.84365,0.64452,-0.04894,0.39490],[12.5,4.27869,0.67386,-0.04272,0.35850],
+[13.0,3.21417,0.72260,-0.03661,0.31163],[13.5,1.83456,0.78383,-0.03067,0.25826],
+[14.0,0.32425,0.85062,-0.02500,0.20235],[14.5,-1.13224,0.91605,-0.01967,0.14787],
+[15.0,-2.35055,0.97319,-0.01477,0.09880],[15.5,-3.10326,1.01514,-0.01037,0.05909],
+[16.0,-3.17885,1.03496,-0.00655,0.03272],[16.5,-2.41657,1.02573,-0.00340,0.02364],
+[17.0,-0.65579,0.98054,-0.00100,0.03584],[17.5,2.26429,0.89246,0.00057,0.07327]
+];
+
+// Berkeley Guidance Study (Bayer & Bayley, 1959) — média e desvio-padrão do %EA por idade e sexo (Tabela 8).
+// [idade, média %EA, DP] — meninas só têm dado publicado a partir dos 9,0 anos.
+const BERKELEY_M = [
+[4.5,66.30,1.05],[5.0,61.97,0.93],[5.5,70.18,1.19],[6.0,65.69,1.04],[6.5,74.03,1.33],
+[7.0,69.18,0.93],[7.5,77.70,1.47],[8.0,72.50,0.96],[8.5,81.19,2.00],[9.0,75.61,1.68],
+[9.5,77.21,1.66],[10.0,78.40,1.76],[10.5,79.82,1.77],[11.0,81.30,1.94],[11.5,82.54,2.00],
+[12.0,84.00,2.23],[12.5,85.43,2.49],[13.0,87.32,3.02],[13.5,89.22,3.57],[14.0,91.00,3.96],
+[14.5,92.60,3.85],[15.0,94.60,3.74],[15.5,96.00,3.31],[16.0,97.09,2.71],[16.5,97.95,2.12],
+[17.0,98.79,1.43],[17.5,99.28,1.01]
+];
+const BERKELEY_F = [
+[9.0,83.03,2.13],[9.5,84.76,2.42],[10.0,86.85,2.71],[10.5,88.65,2.88],[11.0,90.81,3.06],
+[11.5,92.61,3.27],[12.0,94.72,2.61],[12.5,95.96,2.15],[13.0,97.17,1.70],[13.5,98.27,1.24],
+[14.0,98.74,0.93],[14.5,99.31,0.68],[15.0,99.54,0.48],[15.5,99.62,0.35],[16.0,99.75,0.34],
+[16.5,99.95,0.25],[17.0,99.91,0.25]
+];
+
+const CM_POR_POL = 2.54;
+const KG_POR_LB = 0.45359237;
+
+function fmt(n,d=1){ return n.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function roundToHalf(x){ return Math.round(x*2)/2; }
+function ageDecimal(birthISO, evalISO){
+  const b = new Date(birthISO+'T00:00:00'), e = new Date(evalISO+'T00:00:00');
+  return (e-b)/86400000/365.25;
+}
+function lookupKR(table, age){
+  const a = Math.min(17.5, Math.max(4.0, roundToHalf(age)));
+  return { row: table.find(r=>Math.abs(r[0]-a)<0.01), ageUsed:a };
+}
+function lookupBerkeley(sexo, age){
+  const table = sexo==='M' ? BERKELEY_M : BERKELEY_F;
+  const min = table[0][0], max = table[table.length-1][0];
+  if(age < min || age > max) return null;
+  const a = Math.min(max, Math.max(min, roundToHalf(age)));
+  const row = table.find(r=>Math.abs(r[0]-a)<0.01);
+  return row ? {media:row[1], dp:row[2], ageUsed:a} : null;
+}
+function classifyZ(z){
+  const az = Math.abs(z);
+  if(az<=1) return {label:'dentro de 1 DP da média para a idade', cls:'good'};
+  if(az<=2) return {label:'entre 1 e 2 DP da média — atenção', cls:'info'};
+  return {label:'além de 2 DP da média para a idade', cls:'warn'};
+}
+function calcEstaturaPredita(sexo, idadeDec, estaturaCm, pesoKg, estPaiCm, estMaeCm){
+  const table = sexo==='M' ? KR_M : KR_F;
+  const {row, ageUsed} = lookupKR(table, idadeDec);
+  const [,b0,cE,cP,cPais] = row;
+  const estaturaIn = estaturaCm / CM_POR_POL;
+  const pesoLb = pesoKg / KG_POR_LB;
+  const midparentCm = (estPaiCm+estMaeCm)/2;
+  const midparentIn = midparentCm / CM_POR_POL;
+  const termE = cE*estaturaIn, termP = cP*pesoLb, termPais = cPais*midparentIn;
+  const predIn = b0+termE+termP+termPais;
+  const pred = predIn * CM_POR_POL;
+  const pctEA = estaturaCm/pred*100;
+  let classe, cls;
+  if(pctEA>96){classe='Pós-puberal';cls='info';}
+  else if(pctEA>=85){classe='Puberal';cls='warn';}
+  else {classe='Pré-puberal';cls='good';}
+  const berkeley = lookupBerkeley(sexo, idadeDec);
+  let z = null, zInfo = null;
+  if(berkeley){ z = (pctEA - berkeley.media) / berkeley.dp; zInfo = classifyZ(z); }
+  return {ageUsed, midparentCm, b0,termE,termP,termPais, pred, pctEA, classe, cls, berkeley, z, zInfo};
+}
+function calcMirwald(sexo, idadeDec, estTotal, estSentado, massa){
+  const cp = estTotal - estSentado;
+  let mo;
+  if(sexo==='M'){
+    mo = -9.236 + 0.0002708*(cp*estSentado) + (-0.001663)*(idadeDec*cp) + 0.007216*(idadeDec*estSentado) + 0.02292*(massa/estTotal*100);
+  } else {
+    mo = -9.376 + 0.0001882*(cp*estSentado) + 0.0022*(idadeDec*cp) + 0.005841*(idadeDec*estSentado) - 0.002658*(idadeDec*massa) + 0.07693*(massa/estTotal*100);
+  }
+  const idadePVE = idadeDec - mo;
+  let estagio, cls;
+  if(mo < -1){estagio='Pré-puberal';cls='good';}
+  else if(mo <= 1){estagio='Puberal';cls='warn';}
+  else {estagio='Pós-puberal';cls='info';}
+  const [loRec,hiRec] = sexo==='M' ? [12,16] : [9,13];
+  const foraFaixa = idadeDec < loRec || idadeDec > hiRec;
+  return {cp, mo, idadePVE, estagio, cls, loRec, hiRec, foraFaixa};
+}
+
+function render(){
+  const sexo = document.getElementById('sexo').value;
+  const dataNasc = document.getElementById('dataNasc').value;
+  const dataAval = document.getElementById('dataAval').value;
+  const estatura = parseFloat(document.getElementById('estatura').value);
+  const peso = parseFloat(document.getElementById('peso').value);
+  const estSentado = parseFloat(document.getElementById('estSentado').value);
+  const estPai = parseFloat(document.getElementById('estPai').value);
+  const estMae = parseFloat(document.getElementById('estMae').value);
+
+  const idadeDec = ageDecimal(dataNasc, dataAval);
+  const ep = calcEstaturaPredita(sexo, idadeDec, estatura, peso, estPai, estMae);
+  const mo = calcMirwald(sexo, idadeDec, estatura, estSentado, peso);
+
+  const zLine = ep.zInfo
+    ? `<div><span>Z (%EA vs. Berkeley, ${fmt(ep.berkeley.ageUsed,1)} anos)</span><span class="v mono">${ep.z>=0?'+':''}${fmt(ep.z,2)}</span></div>`
+    : `<div><span>Z (%EA vs. Berkeley)</span><span class="v mono">sem referência</span></div>`;
+  const zPill = ep.zInfo
+    ? `<span class="pill ${ep.zInfo.cls}">${ep.zInfo.label}</span>`
+    : `<span class="pill pill-on-dark">sem faixa de referência (Berkeley) para essa idade/sexo</span>`;
+
+  const rangeWarn = mo.foraFaixa
+    ? `<div class="note" style="margin-top:14px;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#E9EDF5;">⚠ Idade fora da faixa mais recomendada na literatura aplicada para o PVE (${mo.loRec}–${mo.hiRec} anos, ${sexo==='M'?'meninos':'meninas'}). O cálculo é feito normalmente — a amostra original de Mirwald et al. (2002) foi de 8 a 16 anos combinando os dois sexos, então essa faixa é uma recomendação de uso, não um limite matemático da equação; ainda assim, interprete o resultado com mais cautela fora dela.</div>`
+    : '';
+
+  document.getElementById('results').innerHTML = `
+    <div class="result-card">
+      <div class="strip"></div>
+      <div class="body">
+        <div class="kicker">Estatura Predita · Khamis &amp; Roche</div>
+        <div class="big">${fmt(ep.pred,1)} cm</div>
+        <div class="caption">estatura adulta prevista · idade usada na tabela: ${fmt(ep.ageUsed,1)} anos</div>
+        <span class="pill pill-on-dark">%EA ${fmt(ep.pctEA,1)}% — ${ep.classe}</span>
+        ${zPill}
+        <div class="breakdown">
+          <div><span>β0</span><span class="v mono">${fmt(ep.b0,4)}</span></div>
+          <div><span>coef.Estatura × estatura (pol)</span><span class="v mono">${fmt(ep.termE,2)}</span></div>
+          <div><span>coef.Peso × peso (lb)</span><span class="v mono">${fmt(ep.termP,2)}</span></div>
+          <div><span>coef.Pais × estatura-alvo (${fmt(ep.midparentCm,1)} cm)</span><span class="v mono">${fmt(ep.termPais,2)}</span></div>
+          ${zLine}
+        </div>
+      </div>
+    </div>
+    <div class="result-card">
+      <div class="strip" style="background:var(--brand-lime)"></div>
+      <div class="body">
+        <div class="kicker">Maturity Offset · Mirwald</div>
+        <div class="big">${mo.mo>=0?'+':''}${fmt(mo.mo,2)}</div>
+        <div class="caption">Idade no PVE: ${fmt(mo.idadePVE,1)} anos · idade cronológica: ${fmt(idadeDec,1)} anos</div>
+        <span class="pill pill-on-dark">${mo.estagio}</span>
+        <div class="breakdown">
+          <div><span>Comprimento de perna (CP = ET−ES)</span><span class="v mono">${fmt(mo.cp,1)} cm</span></div>
+          <div><span>Estatura sentado (ES)</span><span class="v mono">${fmt(estSentado,1)} cm</span></div>
+          <div><span>Massa corporal (MC)</span><span class="v mono">${fmt(peso,1)} kg</span></div>
+        </div>
+        <div class="note" style="margin-top:14px;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#C7D0E0;">
+          SEE (erro-padrão da estimativa): ≈0,592 anos em meninos (Kozieł &amp; Malina, 2021, confirmado em fonte primária) e ≈0,503 anos em meninas (valor comum na literatura secundária, não confirmado em fonte primária). R² do modelo original: 0,92 (meninos) / 0,91 (meninas). Os próprios autores recomendam tratar o Maturity Offset como classificação categórica (pré-/puberal/pós-puberal), não como número contínuo de alta precisão.
+        </div>
+        ${rangeWarn}
+      </div>
+    </div>
+  `;
+}
+document.getElementById('btnCalc').addEventListener('click', render);
+render();
+</script>
